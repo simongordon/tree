@@ -16,6 +16,8 @@
   "dependencies": {
     "formik": "^1.1.1",
     "react": "^16.4.2",
-    "react-dom": "^16.4.2"
+    "react-dom": "^16.4.2",
+    "vis": "^4.21.0",
+    "vis-react": "^0.3.0"
   }
 }
