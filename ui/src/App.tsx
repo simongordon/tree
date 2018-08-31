@@ -1,9 +1,11 @@
 import * as React from "react";
-import { Formik, Form, Field } from "formik";
+import { Formik, Form, Field, FormikErrors } from "formik";
 import Graph from "vis-react";
 
 interface Note {
+    id: number;
     content: string;
+    parent: number | null;
 }
 
 interface AppProps {}
@@ -11,32 +13,7 @@ interface AppState {
     notes: Note[]
 }
 
-var graph = {
-    nodes: [
-        {id: 1, label: 'Node 1'},
-        {id: 2, label: 'Node 2'},
-        {id: 3, label: 'Node 3'},
-        {id: 4, label: 'Node 4'},
-        {id: 5, label: 'Node 5'}
-      ],
-    edges: [
-        {from: 1, to: 2},
-        {from: 1, to: 3},
-        {from: 2, to: 4},
-        {from: 2, to: 5}
-      ]
-  };
-   
-  var options = {
-    //   width: "100px",
-    //   height: "100px",
-      layout: {
-          hierarchical: true
-      },
-      edges: {
-          color: "#000000"
-      }
-  };
+
    
   var events = {
       select: function(event) {
@@ -52,8 +29,13 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    addNote(newNote: Note) {
+    addNote({content, parent}: {content: string, parent: string | number}) {
         this.setState(({notes}) => {
+            const newNote: Note = {
+                id: notes.length + 1,
+                content,
+                parent: (parent || parent === 0) ? parseInt(`${parent}`) : null
+            }
             notes.push(newNote);
             return ({notes});
         })
@@ -61,16 +43,49 @@ class App extends React.Component<AppProps, AppState> {
 
     render() {
         const {notes} = this.state;
+
+        const graph: {nodes: {id: 
+            number, label: string}[], edges: {from: number, to: number}[]} = {
+            nodes: notes.map(n => ({
+                id: n.id,
+                label: n.content,
+            })),
+            edges: notes.filter(n => n.parent !== null).map(n => ({
+                from: n.parent as number,
+                to: n.id,
+            }))
+          };
+           
+          var options = {
+            //   width: "100px",
+            //   height: "100px",
+              layout: {
+                  hierarchical: true
+              },
+              edges: {
+                  color: "#000000"
+              }
+          };
+
+
         return <div>
             <ul>
             {
-                notes.map(n => <li>{n.content}</li>)
+                notes.map(n => <li><strong>{n.id}</strong> {n.content}</li>)
             }
             </ul>
 
             <Formik
                 initialValues={{
-                    content: ''
+                    content: '',
+                    parent: ''
+                }}
+                validate={(values) => {
+                    const errors: FormikErrors<typeof values> = {};
+                    // if ((values.parent == "")) {
+                    //     errors.parent = "Requried";
+                    // }
+                    return errors;
                 }}
                 onSubmit={(values, {resetForm}) => {
                     this.addNote(values);
@@ -80,6 +95,10 @@ class App extends React.Component<AppProps, AppState> {
                         <Field 
                         id="content"
                         name="content"
+                        />
+                        <Field 
+                        id="parent"
+                        name="parent"
                         />
                         <button type="submit">Add</button>
                     </Form>}
