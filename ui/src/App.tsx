@@ -119,12 +119,23 @@ class App extends React.Component<AppProps, AppState> {
                 }}
                 validate={(values) => {
                     const errors: FormikErrors<typeof values> = {};
-                    if (isNaN(parseInt(values.from))) {
+
+                    const fromInt = parseInt(values.from);
+                    if (isNaN(fromInt)) {
                         errors.from = "NaN";
                     }
-                    if (isNaN(parseInt(values.to))) {
+                    else if (!(notes.findIndex(n => n.id === fromInt) >= 0)) {
+                        errors.from = "Not a valid ID";
+                    }
+
+                    const toInt = parseInt(values.to);
+                    if (isNaN(toInt)) {
                         errors.to = "NaN";
                     }
+                    else if (!(notes.findIndex(n => n.id === toInt) >= 0)) {
+                        errors.to = "Not a valid ID";
+                    }
+
                     return errors;
                 }}
                 onSubmit={(values, { resetForm }) => {
