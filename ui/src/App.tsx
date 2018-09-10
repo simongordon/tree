@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Formik, Form, Field, FormikErrors } from "formik";
 import Graph from "vis-react";
+import { Options, Data } from 'vis';
 
 interface Note {
     id: number;
@@ -44,12 +45,7 @@ class App extends React.Component<AppProps, AppState> {
     render() {
         const { notes } = this.state;
 
-        const graph: {
-            nodes: {
-                id:
-                number, label: string
-            }[], edges: { from: number, to: number }[]
-        } = {
+        const graph: Data = {
             nodes: notes.map(n => ({
                 id: n.id,
                 label: n.content,
@@ -60,7 +56,7 @@ class App extends React.Component<AppProps, AppState> {
             }))
         };
 
-        var options = {
+        var options: Options = {
             //   width: "100px",
             //   height: "100px",
             layout: {

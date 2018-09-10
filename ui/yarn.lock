@@ -47,6 +47,12 @@
   version "5.5.0"
   resolved "https://registry.yarnpkg.com/@types/semver/-/semver-5.5.0.tgz#146c2a29ee7d3bae4bf2fcb274636e264c813c45"
 
+"@types/vis@^4.21.7":
+  version "4.21.7"
+  resolved "https://registry.yarnpkg.com/@types/vis/-/vis-4.21.7.tgz#a499b4ac37eb2e62519686d5760f2ef92cea15c2"
+  dependencies:
+    moment ">=2.13.0"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -2868,7 +2874,7 @@ mixin-deep@^1.2.0:
   dependencies:
     minimist "0.0.8"
 
-moment@^2.18.1:
+moment@>=2.13.0, moment@^2.18.1:
   version "2.22.2"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
 
