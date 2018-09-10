@@ -8,18 +8,18 @@ interface Note {
     parent: number | null;
 }
 
-interface AppProps {}
+interface AppProps { }
 interface AppState {
     notes: Note[]
 }
 
 
-   
-  var events = {
-      select: function(event) {
-          var { nodes, edges } = event;
-      }
-  }
+
+var events = {
+    select: function (event) {
+        var { nodes, edges } = event;
+    }
+}
 
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
@@ -29,23 +29,27 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    addNote({content, parent}: {content: string, parent: string | number}) {
-        this.setState(({notes}) => {
+    addNote({ content, parent }: { content: string, parent: string | number }) {
+        this.setState(({ notes }) => {
             const newNote: Note = {
                 id: notes.length + 1,
                 content,
                 parent: (parent || parent === 0) ? parseInt(`${parent}`) : null
             }
             notes.push(newNote);
-            return ({notes});
+            return ({ notes });
         })
     }
 
     render() {
-        const {notes} = this.state;
+        const { notes } = this.state;
 
-        const graph: {nodes: {id: 
-            number, label: string}[], edges: {from: number, to: number}[]} = {
+        const graph: {
+            nodes: {
+                id:
+                number, label: string
+            }[], edges: { from: number, to: number }[]
+        } = {
             nodes: notes.map(n => ({
                 id: n.id,
                 label: n.content,
@@ -54,25 +58,25 @@ class App extends React.Component<AppProps, AppState> {
                 from: n.parent as number,
                 to: n.id,
             }))
-          };
-           
-          var options = {
+        };
+
+        var options = {
             //   width: "100px",
             //   height: "100px",
-              layout: {
-                  hierarchical: true
-              },
-              edges: {
-                  color: "#000000"
-              }
-          };
+            layout: {
+                hierarchical: true
+            },
+            edges: {
+                color: "#000000"
+            }
+        };
 
 
         return <div>
             <ul>
-            {
-                notes.map(n => <li><strong>{n.id}</strong> {n.content}</li>)
-            }
+                {
+                    notes.map(n => <li><strong>{n.id}</strong> {n.content}</li>)
+                }
             </ul>
 
             <Formik
@@ -87,26 +91,25 @@ class App extends React.Component<AppProps, AppState> {
                     // }
                     return errors;
                 }}
-                onSubmit={(values, {resetForm}) => {
+                onSubmit={(values, { resetForm }) => {
                     this.addNote(values);
                     resetForm();
                 }}
-                render={({values}) => <Form>
-                        <Field 
+                render={({ values }) => <Form>
+                    <Field
                         id="content"
                         name="content"
-                        />
-                        <Field 
+                    />
+                    <Field
                         id="parent"
                         name="parent"
-                        />
-                        <button type="submit">Add</button>
-                    </Form>}
+                    />
+                    <button type="submit">Add</button>
+                </Form>}
             />
-                        <div>
-
-<Graph graph={graph} options={options} events={events} />
-</div>
+            <div>
+                <Graph graph={graph} options={options} events={events} />
+            </div>
         </div>;
     }
 }
