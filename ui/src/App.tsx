@@ -6,12 +6,17 @@ import { Options, Data } from 'vis';
 interface Note {
     id: number;
     content: string;
-    parent: number | null;
+}
+
+interface Relationship {
+    from: number;
+    to: number;
 }
 
 interface AppProps { }
 interface AppState {
-    notes: Note[]
+    notes: Note[],
+    relationships: Relationship[],
 }
 
 
@@ -26,34 +31,39 @@ class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
         this.state = {
-            notes: []
+            notes: [],
+            relationships: [],
         }
     }
 
-    addNote({ content, parent }: { content: string, parent: string | number }) {
+    addNote({ content }: { content: string }) {
         this.setState(({ notes }) => {
             const newNote: Note = {
                 id: notes.length + 1,
                 content,
-                parent: (parent || parent === 0) ? parseInt(`${parent}`) : null
             }
             notes.push(newNote);
             return ({ notes });
         })
     }
 
+    addRelationship(newRelationship: { from: number, to: number }) {
+        this.setState(({ relationships }) => {
+            relationships.push(newRelationship);
+            return ({ relationships });
+        })
+    }
+
+
     render() {
-        const { notes } = this.state;
+        const { notes, relationships } = this.state;
 
         const graph: Data = {
             nodes: notes.map(n => ({
                 id: n.id,
                 label: n.content,
             })),
-            edges: notes.filter(n => n.parent !== null).map(n => ({
-                from: n.parent as number,
-                to: n.id,
-            }))
+            edges: relationships.map(o => o) // dunno why
         };
 
         var options: Options = {
@@ -64,27 +74,27 @@ class App extends React.Component<AppProps, AppState> {
             },
             edges: {
                 color: "#000000"
+            },
+            manipulation: {
+                addEdge: (data, callback) => {
+                    console.log(data);
+                }
             }
         };
 
 
         return <div>
-            <ul>
-                {
-                    notes.map(n => <li><strong>{n.id}</strong> {n.content}</li>)
-                }
-            </ul>
 
-            <Formik
+
+            <Formik<{ content: string }>
                 initialValues={{
                     content: '',
-                    parent: ''
                 }}
                 validate={(values) => {
                     const errors: FormikErrors<typeof values> = {};
-                    // if ((values.parent == "")) {
-                    //     errors.parent = "Requried";
-                    // }
+                    if ((values.content == "")) {
+                        errors.content = "Requried";
+                    }
                     return errors;
                 }}
                 onSubmit={(values, { resetForm }) => {
@@ -95,14 +105,58 @@ class App extends React.Component<AppProps, AppState> {
                     <Field
                         id="content"
                         name="content"
+                        placeholder="content"
+                    />
+                    <button type="submit">Add node</button>
+                </Form>
+                }
+            />
+
+            <Formik<{ from: string, to: string }>
+                initialValues={{
+                    from: '',
+                    to: ''
+                }}
+                validate={(values) => {
+                    const errors: FormikErrors<typeof values> = {};
+                    if (isNaN(parseInt(values.from))) {
+                        errors.from = "NaN";
+                    }
+                    if (isNaN(parseInt(values.to))) {
+                        errors.to = "NaN";
+                    }
+                    return errors;
+                }}
+                onSubmit={(values, { resetForm }) => {
+                    const fixedValues = {
+                        from: parseInt(values.from),
+                        to: parseInt(values.to),
+                    }
+                    this.addRelationship(fixedValues);
+                    resetForm();
+                }}
+                render={({ values }) => <Form>
+                    <Field
+                        id="from"
+                        name="from"
+                        placeholder="from"
                     />
                     <Field
-                        id="parent"
-                        name="parent"
+                        id="to"
+                        name="to"
+                        placeholder="to"
                     />
-                    <button type="submit">Add</button>
-                </Form>}
+                    <button type="submit">Add relationship</button>
+                </Form>
+                }
             />
+
+            <ul>
+                {
+                    notes.map(n => <li key={n.id}><strong>{n.id}</strong> {n.content}</li>)
+                }
+            </ul>
+
             <div>
                 <Graph graph={graph} options={options} events={events} />
             </div>
